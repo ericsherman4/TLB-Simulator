@@ -22,30 +22,49 @@ class gvars:
 class TLB:
     use = [0] * gvars.SIZE_TLB_ENTRIES
     entries = [0] * gvars.SIZE_TLB_ENTRIES
+    last_used = [0] * gvars.SIZE_TLB_ENTRIES #number of cycles that have elasped since it was last used
     num_entries = 0
     num_hits = 0
     hit_rate = 1
 
 
-
+def LRU_update(RU_idx, num_entries):
+    TLB.last_used[RU_idx] = 0
+    for k in range(0,num_entries):
+        if k != RU_idx:
+            TLB.last_used[k] += 1
+        
 
 def TLB_action(i,data):
     
     # check for hit or miss
     miss = True
     for idx in range(0,gvars.SIZE_TLB_ENTRIES):
+        #it hits
         if(TLB.use[idx] and data[1] == TLB.entries[idx]):
             # print("hit")
             TLB.num_hits += 1
             TLB.hit_rate = TLB.num_hits / i
             miss = False
+            LRU_update(idx, TLB.num_entries)
             break
     if miss:
         # print("miss")
         TLB.hit_rate = TLB.num_hits / i
+        #if TLB is full, use LRU
         if TLB.num_entries == gvars.SIZE_TLB_ENTRIES:
             # use bit doesnt change, num entries doesnt change
-            TLB.entries[random.randint(0,gvars.SIZE_TLB_ENTRIES-1)] = data[1]
+            # TLB.entries[random.randint(0,gvars.SIZE_TLB_ENTRIES-1)] = data[1]
+            max_val =  TLB.last_used[0]
+            idx = None
+            for k in range(0, gvars.SIZE_TLB_ENTRIES):
+                if TLB.last_used[k] >= max_val:
+                    idx = k
+            print(idx)
+            LRU_update(idx, TLB.num_entries)
+            TLB.entries[k] = data[1]
+
+
         else:
             # find the first empty spot
             for idx in range(0, gvars.SIZE_TLB_ENTRIES):
@@ -54,10 +73,10 @@ def TLB_action(i,data):
                     TLB.entries[idx] = data[1]
                     TLB.num_entries+=1
                     TLB.use[idx] = 1
+                    LRU_update(idx, TLB.num_entries)
                     break
 
 
-        
 
 def main():
     print("Main called.")
@@ -67,12 +86,13 @@ def main():
 
     i = 0
 
-    # while( i < len(contents)):
-    while( i < 2200):
+    while( i < len(contents)):
+    # while( i < 2):
         data = [int(contents[i][0:1]),int(contents[i][2:-1],16)]
         data[1] = (data[1] & gvars.VPN_MASK) >> gvars.SIZE_OFFSET
         # print(TLB_entries)
         TLB_action(i+1,data)
+        # print(TLB.last_used)
         
 
         # print(data[1])
