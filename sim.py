@@ -58,6 +58,7 @@ def TLB_action(i,data):
             # TLB.entries[random.randint(0,gvars.SIZE_TLB_ENTRIES-1)] = data[1]
             max_val =  TLB.last_used[0]
             idx = None
+<<<<<<< HEAD
             # for k in range(0, gvars.SIZE_TLB_ENTRIES):
             #     if TLB.last_used[k] >= max_val:
             #         idx = k
@@ -65,6 +66,14 @@ def TLB_action(i,data):
             # print("THINGT HERE" + str(idx) + "\n\n")
             LRU_update(idx, TLB.num_entries)
             TLB.entries[idx] = data[1]
+=======
+            for k in range(0, gvars.SIZE_TLB_ENTRIES):
+                if TLB.last_used[k] >= max_val:
+                    idx = k
+            # print("THINGT HERE" + str(idx) + "\n\n")
+            LRU_update(idx, TLB.num_entries)
+            TLB.entries[k] = data[1]
+>>>>>>> 761544e4fdb577ebc15bbf79ccf0bc099002ce32
         else:
             # find the first empty spot
             for idx in range(0, gvars.SIZE_TLB_ENTRIES):
@@ -88,6 +97,7 @@ def main():
 
     i = 0
     length = len(contents)
+<<<<<<< HEAD
     increment_add = int(length / 10)
     percentage_add = int(100/10)
     increment = increment_add
@@ -114,6 +124,13 @@ def main():
 
     print("Percent complete: 0%")
 
+=======
+    increment_add = int(length / 25)
+    percentage_add = int(100/25)
+    increment = increment_add
+    percentage = percentage_add
+
+>>>>>>> 761544e4fdb577ebc15bbf79ccf0bc099002ce32
     while( i < length):
     # while( i < 300000):
         data = [int(contents[i][0:1]),int(contents[i][2:-1],16)]
@@ -124,7 +141,7 @@ def main():
         # print(TLB.last_used)
 
         if i == increment: 
-            print("\rPercent complete: " + str(percentage) + "%")
+            print("Percent complete: " + str(percentage) + "%")
             increment += increment_add
             percentage += percentage_add
 
